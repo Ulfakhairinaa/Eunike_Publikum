@@ -1,0 +1,117 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  name            String
+  school          String
+  gender          String
+  createdAt       DateTime       @default(now())
+  assessments     Assessment[]
+  game_progress   GameProgress[]
+}
+
+model Assessment {
+  id              String          @id @default(uuid())
+  user_id         String
+  user            User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  status          String          // "PENDING", "COMPLETED"
+  createdAt       DateTime        @default(now())
+  analysis        AnalysisResult?
+  answers         UserAnswer[]
+}
+
+model UserAnswer {
+  id              String          @id @default(uuid())
+  assessment_id   String
+  assessment      Assessment      @relation(fields: [assessment_id], references: [id], onDelete: Cascade)
+  question_id     String
+  question        Question        @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  answer_text     String
+  createdAt       DateTime        @default(now())
+
+  @@unique([assessment_id, question_id])
+}
+
+model Question {
+  id              String         @id @default(uuid())
+  type            String         // "RIASEC", "DAT"
+  category        String         // "Realistic", "Verbal"
+  question_text   String
+  option_a        String
+  option_b        String
+  option_c        String
+  option_d        String
+  correct_answer  String?        // Khusus untuk soal DAT yang memiliki kunci jawaban
+  score_weight    Int            @default(1)
+  
+  user_answers    UserAnswer[]
+}
+
+model AnalysisResult {
+  id              String         @id @default(uuid())
+  assessment_id   String         @unique
+  assessment      Assessment     @relation(fields: [assessment_id], references: [id], onDelete: Cascade)
+  riasec_scores   Json           // Menyimpan objek skor { R: 20, I: 15, dst }
+  dat_scores      Json           // Menyimpan objek skor { Verbal: 80, Numerical: 70 }
+  createdAt       DateTime       @default(now())
+}
+
+model Major {
+  id              String         @id @default(uuid())
+  name            String
+  description     String
+  profiles        MajorProfile[]
+  missions        GameMission[]
+}
+
+model MajorProfile {
+  id              String         @id @default(uuid())
+  major_id        String
+  major           Major          @relation(fields: [major_id], references: [id], onDelete: Cascade)
+  ideal_riasec    Json           // Atribut skor acuan ideal jurusan
+  ideal_dat       Json           // Atribut skor acuan bakat ideal jurusan
+}
+
+model GameMission {
+  id              String         @id @default(uuid())
+  major_id        String
+  major           Major          @relation(fields: [major_id], references: [id], onDelete: Cascade)
+  title           String
+  level           Int
+  min_point       Int
+  questions       GameQuestion[]
+  progress        GameProgress[]
+}
+
+model GameQuestion {
+  id              String         @id @default(uuid())
+  mission_id      String
+  mission         GameMission    @relation(fields: [mission_id], references: [id], onDelete: Cascade)
+  scenario_text   String
+  option_a        String
+  option_b        String
+  option_c        String
+  option_d        String
+  correct_option  String
+  points          Int
+}
+
+model GameProgress {
+  id              String         @id @default(uuid())
+  user_id         String
+  user            User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  mission_id      String
+  mission         GameMission    @relation(fields: [mission_id], references: [id], onDelete: Cascade)
+  status          String         // NILAI: "locked", "unlocked", "completed"
+  current_points  Int            @default(0)
+  updatedAt       DateTime       @updatedAt
+  
+  @@unique([user_id, mission_id])
+}
