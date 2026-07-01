@@ -36,7 +36,7 @@ export default async function ProfilePage() {
 
   const assessmentCount = await prisma.assessment.count({ where: { user_id: user.id } })
   const completedCount = await prisma.assessment.count({
-    where: { user_id: user.id, status: 'COMPLETED' }, orderBy: { created_at: 'desc' }
+    where: { user_id: user.id, status: 'COMPLETED' }, orderBy: { createdAt: 'desc' }
   })
 
   const getInitials = (name: string) =>

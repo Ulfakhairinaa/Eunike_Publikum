@@ -17,7 +17,7 @@ export default async function HasilAnalisisPage() {
   if (!user) redirect('/auth/login')
 
   const assessment = await prisma.assessment.findFirst({
-    where: { user_id: user.id, status: 'COMPLETED' }, orderBy: { created_at: 'desc' },
+    where: { user_id: user.id, status: 'COMPLETED' }, orderBy: { createdAt: 'desc' },
     include: { analysis: true }
   })
 
