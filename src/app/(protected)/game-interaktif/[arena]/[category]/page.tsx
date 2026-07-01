@@ -30,7 +30,7 @@ export default async function CategoryMissionsPage({ params }: { params: Promise
   })
 
   // Cari major yang namanya cocok dengan slug
-  const matchedMajor = allMajorsInArena.find(m => {
+  const matchedMajor = allMajorsInArena.find((m: any) => {
     const catLower = m.category.toLowerCase()
     return searchTerms.every(term => catLower.includes(term))
   })
