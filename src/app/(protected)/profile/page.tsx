@@ -1,30 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { User, Mail, School, Users } from 'lucide-react'
-
-async function updateProfile(formData: FormData) {
-  'use server'
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login')
-
-  const name = formData.get('name') as string
-  const school = formData.get('school') as string
-  const gender = formData.get('gender') as string
-
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { name, school, gender }
-  })
-
-  revalidatePath('/profile')
-}
+import { ProfileForm } from '@/components/profile/ProfileForm'
+import { DeleteAccountSection } from '@/components/profile/DeleteAccountSection'
+import { Calendar, CheckCircle, ClipboardList, Shield } from 'lucide-react'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -36,131 +15,80 @@ export default async function ProfilePage() {
 
   const assessmentCount = await prisma.assessment.count({ where: { user_id: user.id } })
   const completedCount = await prisma.assessment.count({
-    where: { user_id: user.id, status: 'COMPLETED' }, orderBy: { createdAt: 'desc' }
+    where: { user_id: user.id, status: 'COMPLETED' }
   })
 
   const getInitials = (name: string) =>
     name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
 
+  const joinDate = new Date(dbUser.createdAt).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+
   return (
-    <div className="p-8 space-y-6 max-w-2xl">
+    <div className="max-w-5xl mx-auto p-6 md:p-10 space-y-8">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Profile</h1>
-        <p className="text-slate-500 mt-1">Kelola informasi akun dan data dirimu.</p>
+        <h1 className="text-3xl font-bold text-[#0B3B60]">Profil Pengguna</h1>
+        <p className="text-slate-500 mt-2 text-lg">Kelola informasi akun, preferensi, dan data dirimu di sini.</p>
       </div>
 
-      {/* Avatar & stats */}
-      <div className="flex items-center gap-5 p-5 bg-white border border-slate-200 rounded-2xl shadow-sm">
-        <div
-          className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-black shrink-0"
-          style={{ background: '#003D76' }}
-        >
-          {getInitials(dbUser.name)}
-        </div>
-        <div className="flex-1">
-          <p className="text-lg font-bold text-slate-800">{dbUser.name}</p>
-          <p className="text-sm text-slate-500">{dbUser.email}</p>
-          <div className="flex gap-4 mt-2 text-xs text-slate-500">
-            <span>{assessmentCount} sesi tes</span>
-            <span>·</span>
-            <span>{completedCount} tes selesai</span>
-            <span>·</span>
-            <span>Bergabung {new Date(dbUser.createdAt).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</span>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* Kolom Kiri: Avatar & Statistik */}
+        <div className="lg:col-span-4 space-y-6">
+          {/* Card Profil Utama */}
+          <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm text-center flex flex-col items-center">
+            <div 
+              className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-black mb-4 shadow-md bg-gradient-to-br from-[#0B3B60] to-[#1a5b8f]"
+            >
+              {getInitials(dbUser.name)}
+            </div>
+            <h2 className="text-xl font-bold text-slate-800 mb-1">{dbUser.name}</h2>
+            <p className="text-sm text-slate-500 font-medium mb-6 bg-slate-100 px-3 py-1 rounded-full">{dbUser.email}</p>
+            
+            <div className="w-full flex items-center justify-center gap-2 text-sm text-slate-500 pt-4 border-t border-slate-100">
+              <Calendar size={16} /> Bergabung sejak {joinDate}
+            </div>
+          </div>
+
+          {/* Card Statistik */}
+          <div className="bg-[#0B3B60] rounded-2xl p-6 text-white shadow-md">
+            <h3 className="font-bold mb-4 flex items-center gap-2 opacity-90"><Shield size={18}/> Statistik Aktivitas</h3>
+            <div className="space-y-4">
+              <div className="bg-white/10 rounded-xl p-4 flex items-center justify-between border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-400/20 rounded-lg">
+                    <ClipboardList size={20} className="text-blue-300" />
+                  </div>
+                  <span className="font-medium">Total Sesi Tes</span>
+                </div>
+                <span className="text-xl font-bold">{assessmentCount}</span>
+              </div>
+              <div className="bg-white/10 rounded-xl p-4 flex items-center justify-between border border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-400/20 rounded-lg">
+                    <CheckCircle size={20} className="text-green-300" />
+                  </div>
+                  <span className="font-medium">Tes Selesai</span>
+                </div>
+                <span className="text-xl font-bold">{completedCount}</span>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Kolom Kanan: Form Edit & Danger Zone */}
+        <div className="lg:col-span-8 space-y-8">
+          <ProfileForm user={{
+            name: dbUser.name,
+            email: dbUser.email,
+            school: dbUser.school,
+            gender: dbUser.gender
+          }} />
+          
+          <DeleteAccountSection />
+        </div>
+        
       </div>
-
-      {/* Edit form */}
-      <Card className="shadow-sm border-slate-200">
-        <CardHeader className="border-b py-4">
-          <CardTitle className="text-base flex items-center gap-2">
-            <User size={16} className="text-primary" />
-            Edit Informasi Profil
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-5">
-          <form action={updateProfile} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-sm font-medium text-slate-700">Nama Lengkap</Label>
-              <div className="relative">
-                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <Input
-                  id="name"
-                  name="name"
-                  defaultValue={dbUser.name}
-                  required
-                  className="pl-9"
-                  placeholder="Nama lengkap kamu"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email</Label>
-              <div className="relative">
-                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <Input
-                  id="email"
-                  value={dbUser.email}
-                  disabled
-                  className="pl-9 bg-slate-50 text-slate-500 cursor-not-allowed"
-                />
-              </div>
-              <p className="text-xs text-slate-400">Email tidak dapat diubah.</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="school" className="text-sm font-medium text-slate-700">Sekolah / Institusi</Label>
-              <div className="relative">
-                <School size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <Input
-                  id="school"
-                  name="school"
-                  defaultValue={dbUser.school}
-                  className="pl-9"
-                  placeholder="Nama sekolah kamu"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="gender" className="text-sm font-medium text-slate-700">Jenis Kelamin</Label>
-              <div className="relative">
-                <Users size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <select
-                  id="gender"
-                  name="gender"
-                  defaultValue={dbUser.gender}
-                  className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
-                >
-                  <option value="">Pilih jenis kelamin</option>
-                  <option value="male">Laki-laki</option>
-                  <option value="female">Perempuan</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <Button type="submit" className="w-full">Simpan Perubahan</Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Danger zone */}
-      <Card className="shadow-sm border-red-100">
-        <CardHeader className="border-b py-4">
-          <CardTitle className="text-base text-red-600">Zona Berbahaya</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-5">
-          <p className="text-sm text-slate-500 mb-4">
-            Menghapus akun akan menghapus semua data termasuk riwayat tes dan analisis secara permanen.
-          </p>
-          <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50" disabled>
-            Hapus Akun (Segera Hadir)
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   )
 }

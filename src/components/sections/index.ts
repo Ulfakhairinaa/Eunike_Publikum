@@ -1,0 +1,7 @@
+export { LoginSection } from './LoginSection'
+export { RegisterSection } from './RegisterSection'
+export { DashboardSection } from './DashboardSection'
+export { QuizDetailSection } from './QuizDetailSection'
+export { HasilAnalisisSection } from './HasilAnalisisSection'
+export { RekomendasiJurusanSection } from './RekomendasiJurusanSection'
+export { LandingSection } from './LandingSection'

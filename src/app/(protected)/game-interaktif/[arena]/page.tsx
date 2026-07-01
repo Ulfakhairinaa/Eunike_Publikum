@@ -1,11 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { Card, CardContent } from '@/components/ui/card'
-import {
-  ArrowLeft, Stethoscope, Terminal, Building2, FlaskConical,
-  GraduationCap, Briefcase, Palette, Megaphone, Users, BookOpen, ArrowRight
-} from 'lucide-react'
+import { ArrowLeft, Stethoscope, Terminal, Building2, FlaskConical, GraduationCap, Briefcase, Palette, Megaphone, Users, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 
 // Slug helper: "Teknik & Rekayasa" → "teknik-rekayasa"
@@ -16,16 +12,16 @@ function toSlug(name: string) {
 // Map icon based on category name
 const getCategoryIcon = (category: string) => {
   const c = category.toLowerCase()
-  if (c.includes('kesehatan'))   return <Stethoscope className="text-red-400"    size={24} />
-  if (c.includes('teknik'))      return <FlaskConical className="text-blue-400"   size={24} />
-  if (c.includes('komputasi'))   return <Terminal      className="text-indigo-400" size={24} />
-  if (c.includes('arsitektur'))  return <Building2     className="text-orange-400" size={24} />
-  if (c.includes('pendidikan'))  return <GraduationCap className="text-green-400"  size={24} />
-  if (c.includes('sosial'))      return <Users         className="text-purple-400" size={24} />
-  if (c.includes('bisnis') || c.includes('ekonomi')) return <Briefcase className="text-yellow-400" size={24} />
-  if (c.includes('bahasa') || c.includes('seni'))    return <Palette   className="text-pink-400"   size={24} />
-  if (c.includes('komunikasi'))  return <Megaphone    className="text-teal-400"   size={24} />
-  return <BookOpen className="text-slate-400" size={24} />
+  if (c.includes('kesehatan'))   return <Stethoscope size={32} />
+  if (c.includes('teknik'))      return <FlaskConical size={32} />
+  if (c.includes('komputasi'))   return <Terminal size={32} />
+  if (c.includes('arsitektur'))  return <Building2 size={32} />
+  if (c.includes('pendidikan'))  return <GraduationCap size={32} />
+  if (c.includes('sosial'))      return <Users size={32} />
+  if (c.includes('bisnis') || c.includes('ekonomi')) return <Briefcase size={32} />
+  if (c.includes('bahasa') || c.includes('seni'))    return <Palette size={32} />
+  if (c.includes('komunikasi'))  return <Megaphone size={32} />
+  return <BookOpen size={32} />
 }
 
 export default async function ArenaPage({ params }: { params: Promise<{ arena: string }> }) {
@@ -75,41 +71,32 @@ export default async function ArenaPage({ params }: { params: Promise<{ arena: s
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((cat) => {
-          // Gunakan slug untuk URL agar aman dari karakter spesial
           const slug = toSlug(cat.name)
           return (
             <Link
               href={`/game-interaktif/${resolvedParams.arena.toLowerCase()}/${slug}`}
               key={cat.name}
             >
-              <Card className="hover:border-blue-300 transition-all cursor-pointer h-full border-2 border-transparent bg-[#466a8c] hover:bg-[#345371] shadow-sm hover:shadow-md text-white">
-                <CardContent className="p-6 space-y-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl shadow-sm flex items-center justify-center">
-                    <div className="text-white">
-                      {getCategoryIcon(cat.name)}
-                    </div>
+              <div className="rounded-xl border-2 border-transparent bg-[#466a8c] hover:bg-[#345371] shadow-sm hover:shadow-md text-white overflow-hidden transition-all h-[250px] flex flex-col justify-center items-center text-center p-8">
+                <div className="w-16 h-16 bg-white/10 rounded-2xl shadow-inner flex items-center justify-center mb-4">
+                  <div className="text-white">
+                    {getCategoryIcon(cat.name)}
                   </div>
-                  <div>
-                    <h3 className="font-bold text-xl">{cat.name}</h3>
-                    <p className="text-sm text-white/70 mt-1 line-clamp-2">{cat.description}</p>
-                  </div>
-                  <div className="pt-4 mt-4 border-t border-white/20 flex items-center justify-between text-xs font-medium text-white/80">
-                    <span className="flex items-center gap-1">
-                      <span className="w-4 h-4 rounded flex items-center justify-center text-[12px]">📋</span>
-                      {cat.missionCount} Misi Tersedia
-                    </span>
-                    <ArrowRight size={14} className="text-white/60" />
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+                <div>
+                  <h3 className="font-bold text-2xl mb-2">{cat.name}</h3>
+                  <p className="text-xs text-white/70 line-clamp-2 leading-relaxed px-2">{cat.description}</p>
+                </div>
+                <div className="mt-auto w-full pt-4 border-t border-white/10 flex items-center justify-between text-xs font-medium text-white/80">
+                  <span className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full">
+                    <span>📋</span> {cat.missionCount} Misi Tersedia
+                  </span>
+                  <span className="text-white/60">Masuk &rarr;</span>
+                </div>
+              </div>
             </Link>
           )
         })}
-        {categories.length === 0 && (
-          <div className="col-span-full py-12 text-center text-slate-500">
-            Belum ada sub-kategori untuk arena ini.
-          </div>
-        )}
       </div>
     </div>
   )

@@ -32,10 +32,11 @@ export default async function GameInteraktifPage() {
         {/* Saintek Card */}
         <Card className="overflow-hidden border-2 hover:border-blue-500 transition-all shadow-sm hover:shadow-md">
           <div className="h-48 bg-slate-100 relative group overflow-hidden">
-             {/* Mock image background for Saintek */}
-             <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-cyan-700 flex items-center justify-center">
-                <Gamepad2 size={64} className="text-white opacity-80" />
-             </div>
+             <img 
+               src="/images/game_saintek.png" 
+               alt="Saintek Game Arena" 
+               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+             />
           </div>
           <CardContent className="p-6 text-center space-y-4">
             <h2 className="text-2xl font-bold text-slate-800">Saintek</h2>
@@ -58,10 +59,11 @@ export default async function GameInteraktifPage() {
         {/* Soshum Card */}
         <Card className="overflow-hidden border-2 hover:border-[#6b4c1a] transition-all shadow-sm hover:shadow-md">
           <div className="h-48 bg-slate-100 relative group overflow-hidden">
-             {/* Mock image background for Soshum */}
-             <div className="absolute inset-0 bg-gradient-to-br from-[#4a310d] to-[#8c672b] flex items-center justify-center">
-                <Gamepad2 size={64} className="text-white opacity-80" />
-             </div>
+             <img 
+               src="/images/game_soshum.png" 
+               alt="Soshum Game Arena" 
+               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+             />
           </div>
           <CardContent className="p-6 text-center space-y-4">
             <h2 className="text-2xl font-bold text-[#6b4c1a]">Soshum</h2>

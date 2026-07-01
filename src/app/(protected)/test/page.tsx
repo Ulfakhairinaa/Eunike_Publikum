@@ -38,7 +38,7 @@ export default async function TestPage() {
   if (!user) redirect('/auth/login')
 
   return (
-    <div className="flex flex-col min-h-full">
+    <div className="flex flex-col min-h-screen bg-slate-50">
       <Suspense fallback={
         <div className="flex flex-col items-center justify-center h-full space-y-4 py-20">
           <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -52,6 +52,10 @@ export default async function TestPage() {
 }
 
 async function QuizLoader({ userId }: { userId: string }) {
-  const questions = await getQuestions()
-  return <QuizClient questions={questions} userId={userId} />
+  const [questions, dbUser] = await Promise.all([
+    getQuestions(),
+    prisma.user.findUnique({ where: { id: userId } })
+  ])
+  
+  return <QuizClient questions={questions} userId={userId} userName={dbUser?.name || 'Siswa'} />
 }
