@@ -60,11 +60,8 @@ export default async function CategoryMissionsPage({ params }: { params: Promise
     orderBy: { level: 'asc' }
   })
 
-  // Total poin user dari semua progress
-  const allProgress = await prisma.gameProgress.findMany({
-    where: { user_id: user.id }
-  })
-  const totalPoints = allProgress.reduce((sum, p) => sum + p.current_points, 0)
+  // Hitung total poin HANYA dari misi-misi di kategori ini
+  const totalPoints = missions.reduce((sum, m) => sum + (m.progress[0]?.current_points || 0), 0)
 
   // Hitung misi yang sudah selesai di kategori ini
   const completedMissionsCount = missions.filter(m => m.progress[0]?.status === 'completed').length

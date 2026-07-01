@@ -57,9 +57,14 @@ export async function POST(req: Request) {
       }
     })
 
-    // Hitung total poin user untuk cek unlock misi berikutnya
+    // Hitung total poin user HANYA dari misi-misi di major (kategori) yang sama
     const allProgress = await prisma.gameProgress.findMany({
-      where: { user_id: user.id }
+      where: { 
+        user_id: user.id,
+        mission: {
+          major_id: mission.major_id
+        }
+      }
     })
     const totalPoints = allProgress.reduce((sum, p) => sum + p.current_points, 0)
 

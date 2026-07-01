@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 import { QuizSubmissionSchema, type QuizSubmission } from '@/lib/quiz-schema'
-
+import { revalidatePath } from 'next/cache'
 export async function saveAnswerAsync(questionId: string, answer: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -147,6 +147,8 @@ export async function submitQuizAndCalculate(payload: QuizSubmission) {
       where: { id: assessment.id },
       data: { status: 'COMPLETED' }
     })
+
+    revalidatePath('/', 'layout')
 
     return { success: true }
   } catch (error) {
