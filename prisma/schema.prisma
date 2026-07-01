@@ -67,6 +67,8 @@ model Major {
   id              String         @id @default(uuid())
   name            String
   description     String
+  arena           String         @default("Saintek")
+  category        String         @default("Teknologi")
   profiles        MajorProfile[]
   missions        GameMission[]
 }

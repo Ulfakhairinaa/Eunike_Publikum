@@ -159,8 +159,54 @@ export const RIASEC_MAJOR_RECOMMENDATIONS: Record<string, string> = {
 }
 
 export const getRiasecRecommendation = (code: string) => {
+  if (RIASEC_MAJOR_RECOMMENDATIONS[code]) {
+    return {
+      careers: RIASEC_JOB_RECOMMENDATIONS[code],
+      majors: RIASEC_MAJOR_RECOMMENDATIONS[code]
+    }
+  }
+
+  // 1. Coba permutasi dari 3 huruf (jika ACS tidak ada, coba ASC, CAS, dst.)
+  const letters = code.split('');
+  const permutations = [
+    `${letters[0]}${letters[2]}${letters[1]}`, // Swap 2nd and 3rd
+    `${letters[1]}${letters[0]}${letters[2]}`,
+    `${letters[1]}${letters[2]}${letters[0]}`,
+    `${letters[2]}${letters[0]}${letters[1]}`,
+    `${letters[2]}${letters[1]}${letters[0]}`,
+  ];
+
+  for (const perm of permutations) {
+    if (RIASEC_MAJOR_RECOMMENDATIONS[perm]) {
+      return {
+        careers: RIASEC_JOB_RECOMMENDATIONS[perm],
+        majors: RIASEC_MAJOR_RECOMMENDATIONS[perm]
+      }
+    }
+  }
+
+  // 2. Jika tidak ada permutasi yang cocok, cari yang 2 huruf pertamanya sama
+  const keys = Object.keys(RIASEC_MAJOR_RECOMMENDATIONS);
+  const twoLetterMatch = keys.find(k => k.startsWith(code.substring(0, 2)));
+  if (twoLetterMatch) {
+    return {
+      careers: RIASEC_JOB_RECOMMENDATIONS[twoLetterMatch],
+      majors: RIASEC_MAJOR_RECOMMENDATIONS[twoLetterMatch]
+    }
+  }
+
+  // 3. Jika masih tidak ada, cari yang huruf pertamanya sama
+  const oneLetterMatch = keys.find(k => k.startsWith(code.charAt(0)));
+  if (oneLetterMatch) {
+    return {
+      careers: RIASEC_JOB_RECOMMENDATIONS[oneLetterMatch],
+      majors: RIASEC_MAJOR_RECOMMENDATIONS[oneLetterMatch]
+    }
+  }
+
+  // 4. Fallback terakhir
   return {
-    careers: RIASEC_JOB_RECOMMENDATIONS[code] || 'Belum ada rekomendasi karier khusus',
-    majors: RIASEC_MAJOR_RECOMMENDATIONS[code] || 'Belum ada rekomendasi jurusan khusus'
+    careers: 'Belum ada rekomendasi karier khusus',
+    majors: 'Belum ada rekomendasi jurusan khusus'
   }
 }

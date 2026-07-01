@@ -6,7 +6,7 @@ import { logout } from '@/app/auth/actions'
 import { toast } from 'sonner'
 import {
   LayoutDashboard, ClipboardList, BarChart2, BookOpen,
-  GraduationCap, Briefcase, Layers, Gamepad2, History,
+  GraduationCap, Briefcase, Gamepad2, History,
   User, LogOut, Lock
 } from 'lucide-react'
 
@@ -24,7 +24,6 @@ const navItems: NavItem[] = [
   { href: '/rekomendasi-jurusan', label: 'Rekomendasi Jurusan', icon: BookOpen, requiresTest: true },
   { href: '/detail-jurusan', label: 'Detail Jurusan', icon: GraduationCap, requiresTest: true },
   { href: '/prospek-karier', label: 'Prospek Karier', icon: Briefcase, requiresTest: true },
-  { href: '/simulasi-jurusan', label: 'Simulasi Jurusan', icon: Layers },
   { href: '/game-interaktif', label: 'Game Interaktif', icon: Gamepad2, requiresTest: true },
   { href: '/riwayat', label: 'Riwayat', icon: History },
   { href: '/profile', label: 'Profile', icon: User },
