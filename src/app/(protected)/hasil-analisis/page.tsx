@@ -61,7 +61,7 @@ export default async function HasilAnalisisPage() {
               <span className="text-5xl font-black text-primary tracking-tighter">{riasecCode}</span>
             </div>
             <div className="space-y-3">
-              {sortedTraits.map(([trait, score]) => {
+              {sortedTraits.slice(0, 3).map(([trait, score]) => {
                 const pct = Math.round((score / 30) * 100)
                 return (
                   <div key={trait} className="space-y-1">
