@@ -12,7 +12,7 @@ export default async function GameInteraktifPage() {
   if (!user) redirect('/auth/login')
 
   const assessment = await prisma.assessment.findFirst({
-    where: { user_id: user.id, status: 'COMPLETED' },
+    where: { user_id: user.id, status: 'COMPLETED' }, orderBy: { created_at: 'desc' },
     include: { analysis: true }
   })
 

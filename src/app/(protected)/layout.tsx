@@ -18,7 +18,7 @@ export default async function ProtectedLayout({
   const [dbUser, assessment] = await Promise.all([
     prisma.user.findUnique({ where: { id: user.id } }),
     prisma.assessment.findFirst({
-      where: { user_id: user.id, status: 'COMPLETED' }
+      where: { user_id: user.id, status: 'COMPLETED' }, orderBy: { created_at: 'desc' }
     })
   ])
 
