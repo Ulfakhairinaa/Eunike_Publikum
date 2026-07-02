@@ -142,14 +142,14 @@ export const LandingSection = () => {
               <h3 className="text-5xl md:text-6xl font-black text-[#0B3B60] mb-2 tracking-tighter">50–60%</h3>
               <h4 className="text-xl font-bold mb-3">Mahasiswa Salah Jurusan</h4>
               <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                Akibat minimnya Informasi mengenai Kapasitas &amp; Kemampuan Diri (Pra-Kuliah) sehingga Motivasi Belajar Menurun secara signifikan.
+                Akibat minimnya informasi mengenai kapasitas &amp; kemampuan diri (pra-kuliah) sehingga motivasi belajar menurun secara signifikan.
               </p>
               <p className="text-xs font-medium text-slate-400">Persoalan Salah Jurusan Mahasiswa, binus.ac.id, 2025.</p>
             </div>
           </div>
           
           <p className="text-lg md:text-xl text-blue-50 font-medium leading-relaxed max-w-3xl mx-auto">
-            Di tengah minimnya informasi dan tekanan psikologis akan masa depan, YO-MAP lahir sebagai Jawaban. Kami hadir sebagai wadah untuk mengenali minat bakat, mengatasi keraguan, dan merancang strategi matang pasca-lulus sekolah. Mulai langkah hebatmu hari ini bersama fitur unggulan kami.
+            Di tengah minimnya informasi dan tekanan psikologis akan masa depan, YO-MAP lahir sebagai jawaban. Kami hadir sebagai wadah untuk mengenali minat bakat, mengatasi keraguan, dan merancang strategi matang pasca-lulus sekolah. Mulai langkah hebatmu hari ini bersama fitur unggulan kami.
           </p>
         </div>
       </section>
