@@ -52,12 +52,16 @@ export default async function CategoryMissionsPage({ params }: { params: Promise
     orderBy: { level: 'asc' }
   })
 
-  const initialPoints: Record<string, { status: string, points: number }> = {}
-  missions.forEach(m => {
-    if (m.progress && m.progress.length > 0) {
-      initialPoints[m.id] = { status: m.progress[0].status, points: m.progress[0].current_points }
+  const initialPoints: Record<string, { status: string; points: number }> = {}
+
+missions.forEach((m: any) => {
+  if (m.progress && m.progress.length > 0) {
+    initialPoints[m.id] = {
+      status: m.progress[0].status,
+      points: m.progress[0].current_points
     }
-  })
+  }
+})
 
   return (
     <div className="p-8 space-y-8 max-w-6xl mx-auto">
