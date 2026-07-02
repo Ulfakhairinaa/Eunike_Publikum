@@ -1,329 +1,99 @@
+import 'dotenv/config'
 import { prisma } from '../src/lib/prisma'
 
 // ─── HELPER ───────────────────────────────────────────────────────────────────
-// Semua soal pakai opsi yang sama (SS/P/J/BP)
-// Poin: SS=20, P=15, J=10, BP=5
-function q(scenario_text: string) {
+// Sistem Pilihan: Ya / Tidak
+function q(scenario_text: string, funfact: string) {
   return {
     scenario_text,
-    option_a: 'Sangat Sering',
-    option_b: 'Pernah',
-    option_c: 'Jarang',
-    option_d: 'Belum Pernah',
-    correct_option: 'Sangat Sering', // hanya referensi, scoring berbasis pilihan
-    points: 20                        // max poin per soal
+    option_a: 'Ya',
+    option_b: 'Tidak',
+    option_c: '-',
+    option_d: '-',
+    correct_option: 'Ya',
+    points: 10,
+    funfact
   }
 }
 
-// ─── MIN_POINT PER LEVEL ──────────────────────────────────────────────────────
-// 2 soal × maks 20 = 40 poin per misi
-// Level 1: min 10  → complete jika skor ≥ 10 (minim 1 jawaban BP + J)
-// Level 2: min 20  → terbuka saat totalPoints ≥ 20
-// Level 3: min 50  → terbuka saat totalPoints ≥ 50 (perlu skor bagus di L1+L2)
-
-// ─── SAINTEK ─────────────────────────────────────────────────────────────────
-
-const SAINTEK_MISSIONS = {
-  // ── Kesehatan ──────────────────────────────────────────────────────────────
-  'Kesehatan': [
-    {
-      title: 'Misi 1: Pengalaman Belajar di Dunia Kesehatan',
-      level: 1, min_point: 10,
-      questions: [
-        q('Pernah belajar satu materi berjam-jam cuma buat paham satu konsep anatomi atau fisiologi?'),
-        q('Pernah pakai AI buat bantu jelasin materi farmakologi atau biokimia yang susah dipahami?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Kehidupan Praktikum & Lab',
-      level: 2, min_point: 20,
-      questions: [
-        q('Pernah ngerasa satu angka yang salah di perhitungan dosis atau hasil lab bisa bikin semuanya berantakan?'),
-        q('Saat nongkrong, obrolan tiba-tiba nyasar ke tugas anatomi, jadwal praktikum, atau deadline laporan klinik?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Pola Pikir Kritis Tenaga Medis',
-      level: 3, min_point: 50,
-      questions: [
-        q('Pernah menghabiskan waktu lebih lama mencari letak kesalahan diagnosa atau prosedur daripada mengerjakan laporannya?'),
-        q('Saat melihat suatu gejala atau kasus, refleks bertanya "gimana mekanisme patofisiologinya ya?"'),
-      ]
-    },
+const SAINTEK_QUESTIONS = {
+  EASY: [
+    q("Pernah belajar satu materi berjam-jam cuma buat paham satu konsep?", "Di dunia perkuliahan bukan hanya sekadar menghafal loh! Tetapi diperlukan pemahaman agar memudahkan kamu dalam menguasai konsep materi."),
+    q("Pernah pakai AI buat bantu jelasin materi yang susah dipahami?", "Kalau kamu bingung dengan materi yang diberikan dosen, kamu bisa kok meminta bantuan AI untuk menjelaskan atau membantu kamu dalam mencari referensi lainnya yang berkaitan dengan materi kamu."),
+    q("Kalau dosen kasih soal latihan, refleks langsung nyoba ngerjain sendiri?", "Jangan coba-coba untuk Sistem Kebut Semalam ya! Biar kamu bisa memahami soalnya tanpa terburu-buru!"),
+    q("Pernah merasa laptop lebih sering dipakai buat tugas daripada hiburan?", "Kamu bakalan bertemu banyak mahasiswa yang membawa laptop kemana-mana! Bahkan ke kafe pun juga hihi."),
+    q("Saat ujian, pernah belajar bareng sampai menit-menit terakhir?", "Ngomong-ngomong, diskusi singkat bersama teman-teman kelas kamu bakal membantu pikiran kamu untuk me-review materi-materi yang sudah kamu pelajari semalaman loh!"),
+    q("Pernah nyimpen lebih banyak foto slide dosen daripada foto diri sendiri?", "Terkadang penjelasan dari dosen kurang kamu pahami, kamu boleh banget untuk mengambil foto dari slide presentasinya! Jangan khawatir!"),
+    q("Kalau lihat teknologi atau alat baru, suka penasaran cara kerjanya?", "Di bidang Saintek kamu akan banyak bertemu dengan alat ataupun teknologi baru! Pasti sangat seru!"),
+    q("Pernah begadang karena tugas atau deadline?", "Semangat ya! Jangan lupa istirahat yang cukup biar kesehatanmu tetap terjaga.")
   ],
-
-  // ── Teknik & Rekayasa ─────────────────────────────────────────────────────
-  'Teknik & Rekayasa': [
-    {
-      title: 'Misi 1: Hari-Hari Mahasiswa Teknik',
-      level: 1, min_point: 10,
-      questions: [
-        q('Kalau lihat teknologi atau alat baru, suka penasaran cara kerjanya dan langsung ingin tahu lebih dalam?'),
-        q('Pernah begadang karena tugas gambar teknik, simulasi, atau deadline laporan praktikum?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Proyek, Tugas & Deadline Teknik',
-      level: 2, min_point: 20,
-      questions: [
-        q('Pernah merasa satu minggu berlalu cuma karena tugas, praktikum, dan proyek rekayasa yang bertumpuk?'),
-        q('Saat nongkrong, obrolan kamu dan teman teknik selalu nyasar ke proyek, kode, atau perhitungan struktur?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Problem Solving Ala Insinyur',
-      level: 3, min_point: 50,
-      questions: [
-        q('Kalau tugas kelompok desain atau proyek berantakan, refleks langsung cari bagian mana yang salah dan apa penyebabnya?'),
-        q('Pernah berpikir "kayaknya ada yang nggak masuk akal" meskipun hasil akhir hitunganmu benar?'),
-      ]
-    },
+  MEDIUM: [
+    q("Pernah ngerasa satu angka yang salah bisa bikin semuanya berantakan?", "Anak Saintek pasti akan bertemu dengan angka hihi. Jadi kamu harus teliti ya, jangan sampai salah, kalau tidak nanti harus mengulang dari awal deh."),
+    q("Pernah duduk bareng teman berjam-jam tapi masing-masing sibuk ngerjain tugas sendiri?", "Namanya juga tugas individu, kamu pasti akan mengerjakan masing-masing, tapi tidak apa-apa banget loh sesekali berdiskusi dengan teman kamu untuk membahas tugasnya."),
+    q("Pernah buka AI buat ngecek apakah jawabanmu sudah benar?", "Boleh kok menggunakan AI untuk membantu verifikasi pemahaman kamu, tapi jangan untuk mencari jawabannya ya! Tidak boleh!"),
+    q("Pernah nyontek tugas teman bukan buat copas, tapi buat lihat cara pengerjaannya?", "Walaupun cuma cara pengerjaannya, tetap tidak boleh ya! Berusaha sekeras mungkin dalam persiapan ujian sehingga kamu mudah melewatinya, nanti bakal merasakan lega!"),
+    q("Saat nongkrong, obrolan tiba-tiba nyasar ke tugas, praktikum, atau proyek?", "Saking banyaknya tugas, praktikum, dan proyek, sampai menjadi pembahasan di tongkrongan karena akan bertemu tiga hal itu setiap harinya."),
+    q("Pernah merasa satu minggu berlalu cuma karena tugas dan deadline?", "Manajemen waktu yang baik sangat penting supaya kamu juga bisa bersantai!")
   ],
-
-  // ── Komputasi & Data ──────────────────────────────────────────────────────
-  'Komputasi & Data': [
-    {
-      title: 'Misi 1: Hari-Hari Mahasiswa Komputasi',
-      level: 1, min_point: 10,
-      questions: [
-        q('Pernah merasa laptop lebih sering dipakai buat coding, data wrangling, atau analisis daripada hiburan?'),
-        q('Kalau dosen kasih soal algoritma atau pemrograman, refleks langsung nyoba ngerjain sendiri dulu?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Debug, Deadline & Data',
-      level: 2, min_point: 20,
-      questions: [
-        q('Pernah duduk bareng teman di lab komputer berjam-jam, masing-masing sibuk ngerjain tugas sendiri tapi sesekali diskusi soal error?'),
-        q('Pernah buka AI buat ngecek apakah logika kode atau analisis statistikamu sudah benar?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Logika Tinggi & Analisis Mendalam',
-      level: 3, min_point: 50,
-      questions: [
-        q('Pernah menghabiskan waktu lebih lama mencari bug atau letak kesalahan kode daripada nulis kode barunya?'),
-        q('Saat melihat dataset atau fenomena teknologi, refleks bertanya "gimana polanya, ada anomali tidak?"'),
-      ]
-    },
-  ],
-
-  // ── Arsitektur ─────────────────────────────────────────────────────────────
-  'Arsitektur': [
-    {
-      title: 'Misi 1: Dunia Studio Arsitektur',
-      level: 1, min_point: 10,
-      questions: [
-        q('Pernah nyimpen lebih banyak foto referensi desain bangunan dan slide dosen daripada foto diri sendiri di galeri ponselmu?'),
-        q('Kalau lihat gedung atau ruang baru, langsung penasaran struktur, material, dan konsep desainnya?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Maket, Deadline & Studio',
-      level: 2, min_point: 20,
-      questions: [
-        q('Pernah ngerasa satu garis atau detail yang salah di gambar kerja bisa bikin desain keseluruhan berantakan?'),
-        q('Pernah merasa satu minggu berlalu cuma karena deadline maket, presentasi studio, dan revisi desain?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Kritis & Kreatif Ala Arsitek',
-      level: 3, min_point: 50,
-      questions: [
-        q('Kalau dosen kasih studio project sulit, lebih tertarik mencari solusi desain yang tepat daripada sekadar mengejar nilai akhir?'),
-        q('Saat melihat suatu ruang atau bangunan, refleks bertanya "gimana sirkulasi, pencahayaan, dan fungsinya ya?"'),
-      ]
-    },
-  ],
-
-  // ── Pendidikan Saintek ────────────────────────────────────────────────────
-  'Pendidikan Saintek': [
-    {
-      title: 'Misi 1: Menjadi Calon Pendidik Sains',
-      level: 1, min_point: 10,
-      questions: [
-        q('Kalau dosen kasih soal IPA atau matematika, refleks langsung nyoba ngerjain sendiri sebelum lihat buku atau diskusi?'),
-        q('Pernah merasa laptop dan ponselmu lebih banyak berisi modul ajar, video eksperimen, dan referensi sains daripada konten lain?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Kurikulum, Praktikum & Pengajaran',
-      level: 2, min_point: 20,
-      questions: [
-        q('Saat nongkrong, obrolan malah ke RPP, metode mengajar sains, atau cara bikin praktikum yang menarik untuk siswa?'),
-        q('Pernah pakai AI untuk mencari referensi metode pembelajaran sains atau strategi mengajar yang inovatif?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Filosofi Pendidik Sains',
-      level: 3, min_point: 50,
-      questions: [
-        q('Saat ada fenomena alam atau sains yang viral, refleks memikirkan bagaimana cara mengajarkannya ke siswa dengan cara yang menarik?'),
-        q('Saat melihat eksperimen gagal di laboratorium, lebih tertarik mencari tahu kenapa gagal daripada langsung mengulang percobaan?'),
-      ]
-    },
-  ],
+  HARD: [
+    q("Pernah menghabiskan waktu lebih lama mencari letak kesalahan daripada mengerjakan tugasnya?", "Kondisi ini normal banget terjadi loh! Mulai belajar untuk menyeimbangkan antara strategi dengan pengerjaannya ya!"),
+    q("Kalau dosen kasih soal sulit, lebih tertarik mencari jawabannya daripada nilai akhirnya?", "Ketika kamu berusaha menemukan solusi dari soal sulit yang diberikan lalu mendapat jawaban yang benar, rasanya seperti 'Wah, puas banget!'"),
+    q("Kalau tugas kelompok berantakan, refleks langsung cari bagian mana yang salah?", "Kamu dan kelompokmu harus bekerja sama untuk mencari bagian mana yang salah karena itu tindakan awal untuk memperbaiki keadaan."),
+    q("Pernah berpikir \"kayaknya ada yang nggak masuk akal\" meskipun hasil akhirnya benar?", "Ini mungkin akan terjadi padamu karena kamu kurang paham dengan prosesnya, seperti 'Loh benar, kok bisa ya?'"),
+    q("Saat melihat suatu fenomena, refleks bertanya \"gimana mekanismenya ya?\"", "Penasaran tidak sih? Sepertinya kalau menemukan sesuatu yang baru itu menjadi hal menarik tersendiri untuk dipelajari, dan kamu juga bisa bertanya langsung kepada ahlinya, yaitu dosen kamu sendiri!")
+  ]
 }
 
-// ─── SOSHUM ───────────────────────────────────────────────────────────────────
-
-const SOSHUM_MISSIONS = {
-  // ── Sosial & Humaniora ────────────────────────────────────────────────────
-  'Sosial & Humaniora': [
-    {
-      title: 'Misi 1: Kehidupan Sosial di Kampus',
-      level: 1, min_point: 10,
-      questions: [
-        q('Saat diskusi kelas, lebih semangat kalau topiknya dekat dengan isu sosial yang terjadi di kehidupan nyata?'),
-        q('Kenal banyak teman dari berbagai jurusan karena aktif ikut organisasi atau kepanitiaan?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Riset, Referensi & Perspektif',
-      level: 2, min_point: 20,
-      questions: [
-        q('Saat nyari satu referensi jurnal sosial, malah berakhir baca banyak hal lain yang masih nyambung dan relevan?'),
-        q('Saat lihat berita viral, langsung penasaran kenapa orang-orang bereaksi seperti itu secara psikologis atau sosiologis?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Analisis Kritis Sosial',
-      level: 3, min_point: 50,
-      questions: [
-        q('Kalau ada suatu masalah sosial, refleks pertama adalah mencari "kenapa ini bisa terjadi secara struktural" sebelum mencari siapa yang salah?'),
-        q('Saat membaca berita, tiba-tiba mempertanyakan sudut pandang atau framing yang digunakan oleh media tersebut?'),
-      ]
-    },
+const SOSHUM_QUESTIONS = {
+  EASY: [
+    q("Pernah pakai AI buat cari ide atau referensi tugas?", "Kamu bisa kok meminta bantuan AI untuk mencari referensi lainnya yang berkaitan dengan materi kamu, tapi jangan minta untuk diberikan jawaban secara langsung ya!"),
+    q("Saat diskusi kelas, lebih semangat kalau topiknya dekat dengan kehidupan sehari-hari?", "Ini jelas sih, pasti akan jauh lebih mudah dipahami kalau memang topiknya itu terjadi di kehidupan sehari-hari, apalagi dari pengalaman sendiri hahaha."),
+    q("Pernah menghubungkan materi kuliah dengan isu yang lagi viral?", "Fenomena viral pastilah hal yang menarik bagi anak kuliah, apalagi kalau tahu bahwa fenomena tersebut berkaitan dengan materi pembelajaran di kelas."),
+    q("Pernah ikut organisasi atau kepanitiaan buat nambah relasi?", "Satu hal yang sangat penting itu adalah koneksi. Tidak heran kalau anak Soshum temannya ada di mana-mana, melihat poster pendaftaran kepanitiaan saja langsung daftar."),
+    q("Saat nongkrong, obrolan bisa tiba-tiba berubah jadi diskusi serius?", "Seru kan kalau dari obrolan ringan bisa jadi diskusi berbobot? Itulah khasnya mahasiswa Soshum!"),
+    q("Kenal banyak teman dari berbagai jurusan?", "Hal ini sudah dipastikan ya, soalnya organisasi untuk anak Soshum biasanya sangat banyak."),
+    q("Pernah baca materi sambil buka media sosial?", "Jangan kaget kalau kamu melihat tangan kanan mengetik di laptop dan tangan kiri melihat media sosial, karena biasanya anak Soshum akan mengaitkan materi mereka dengan fenomena media sosial."),
+    q("Kalau ada topik menarik, obrolannya bisa lanjut bahkan setelah kelas selesai?", "Itu tandanya kamu benar-benar bersemangat dengan bidang ilmu tersebut. Pertahankan rasa ingin tahumu!")
   ],
-
-  // ── Pendidikan ────────────────────────────────────────────────────────────
-  'Pendidikan': [
-    {
-      title: 'Misi 1: Menjadi Calon Pendidik',
-      level: 1, min_point: 10,
-      questions: [
-        q('Saat diskusi kelas pendidikan, lebih semangat kalau topiknya nyambung ke pengalaman belajar nyata yang pernah kamu alami sendiri?'),
-        q('Pernah baca materi pedagogi sambil sekaligus lihat referensi tren belajar atau fenomena pendidikan di media sosial?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Dinamika Kelas & Pengajaran',
-      level: 2, min_point: 20,
-      questions: [
-        q('Saat ujian atau latihan micro teaching, lebih suka berlatih mengajar dengan cara berdiskusi bareng teman daripada belajar sendirian?'),
-        q('Kalau ada topik pendidikan menarik, obrolannya bisa lanjut bahkan setelah kelas selesai dan kalian sudah di luar kampus?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Filosofi & Etika Pendidik',
-      level: 3, min_point: 50,
-      questions: [
-        q('Lebih tertarik memahami pola pikir dan hambatan belajar siswa yang kesulitan daripada langsung memberi nilai rendah?'),
-        q('Pernah merasa diskusi tentang filosofi atau etika pendidikan yang seru lebih memuaskan daripada mencari jawaban "cara mengajar yang benar"?'),
-      ]
-    },
+  MEDIUM: [
+    q("Saat kerja kelompok, sering kebagian presentasi atau nyusun alur pembahasan?", "Namanya juga kerja kelompok, kamu harus ikut diskusi terkait ide atau alur pembahasannya bersama-sama!"),
+    q("Saat nyari satu referensi, malah berakhir baca banyak hal lain yang masih nyambung?", "Hal ini bakal kamu temui nanti. Sedang membahas topik A, loh kok menyambung ke topik B, eh malah keterusan sampai topik Z."),
+    q("Pernah pakai AI bukan buat cari jawaban, tapi buat cari sudut pandang baru?", "Banyak sudut pandang yang tidak bisa kita pahami dalam satu waktu. Kamu bisa menggunakan AI untuk membantu mencari sudut pandang lainnya! Tapi jangan langsung disalin semua ya!"),
+    q("Saat ujian, lebih suka belajar dengan cara diskusi daripada belajar sendiri?", "Masih terkait sudut pandang nih, teman kamu pasti punya sudut pandang yang berbeda denganmu. Berdiskusi akan membuatmu saling bertukar pemahaman sehingga kamu bisa lebih dalam memahami materi!"),
+    q("Pernah nyontek tugas teman buat lihat cara menyusun argumennya?", "Tidak boleh ya, apapun alasannya! Kamu harus menemukan argumenmu sendiri. Pasti akan sangat ketahuan menyontek kalau argumennya sama persis."),
+    q("Saat lihat berita viral, langsung penasaran kenapa orang-orang bereaksi seperti itu?", "Empati dan analisis sosial yang tajam adalah kunci utama bagi anak Soshum."),
+    q("Pernah membahas isu sosial saat nongkrong lebih lama daripada membahas tugas?", "Kebiasaan anak Soshum nih, kalau ada isu sosial yang sedang ramai, langsung dibahas sampai lupa kalau ada tugas! Coba untuk menyeimbangkannya ya!")
   ],
-
-  // ── Bisnis & Ekonomi ──────────────────────────────────────────────────────
-  'Bisnis & Ekonomi': [
-    {
-      title: 'Misi 1: Dunia Mahasiswa Bisnis',
-      level: 1, min_point: 10,
-      questions: [
-        q('Pernah ikut organisasi atau kepanitiaan kampus dengan semangat membangun relasi dan portofolio bisnis?'),
-        q('Pernah menghubungkan materi manajemen atau akuntansi dengan berita ekonomi atau fenomena bisnis yang lagi viral?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Kolaborasi, Deadline & Analisis',
-      level: 2, min_point: 20,
-      questions: [
-        q('Saat kerja kelompok analisis keuangan atau business plan, sering kebagian presentasi dan menyusun alur pembahasan?'),
-        q('Pernah membahas isu ekonomi atau strategi bisnis suatu brand saat nongkrong lebih lama daripada membahas tugas kuliah?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Analisis Bisnis Tingkat Lanjut',
-      level: 3, min_point: 50,
-      questions: [
-        q('Kalau ada krisis ekonomi atau fenomena pasar, refleks pertama mencari "kenapa ini bisa terjadi secara struktural" daripada langsung berkomentar?'),
-        q('Saat dosen memberi satu studi kasus bisnis, otomatis kepikiran banyak perspektif analisis berbeda sekaligus?'),
-      ]
-    },
-  ],
-
-  // ── Bahasa, Seni & Kreatif ────────────────────────────────────────────────
-  'Bahasa, Seni & Kreatif': [
-    {
-      title: 'Misi 1: Kreativitas di Kampus Seni',
-      level: 1, min_point: 10,
-      questions: [
-        q('Pernah pakai AI buat cari ide visual, referensi desain, atau inspirasi artistik untuk tugas DKV, multimedia, atau seni?'),
-        q('Kalau ada topik desain, sastra, atau seni menarik, obrolan bisa berlanjut bahkan setelah kelas sudah selesai?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Proses Kreatif & Kolaborasi',
-      level: 2, min_point: 20,
-      questions: [
-        q('Pernah pakai AI bukan buat cari jawaban, tapi buat cari sudut pandang estetika atau gaya visual baru yang belum pernah kamu coba?'),
-        q('Saat lihat karya visual, iklan, atau konten kreatif yang viral, langsung penasaran kenapa orang bereaksi kuat terhadapnya?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Kritik & Filosofi Seni',
-      level: 3, min_point: 50,
-      questions: [
-        q('Lebih tertarik memahami mengapa sebuah karya seni atau desain berhasil secara komunikasi daripada sekadar mengaguminya?'),
-        q('Saat melihat suatu fenomena budaya, refleks bertanya "apa makna representasi dan dampaknya bagi masyarakat?"'),
-      ]
-    },
-  ],
-
-  // ── Komunikasi Kreatif ────────────────────────────────────────────────────
-  'Komunikasi Kreatif': [
-    {
-      title: 'Misi 1: Dunia PR & Advertising',
-      level: 1, min_point: 10,
-      questions: [
-        q('Pernah ikut kepanitiaan acara kampus dengan semangat melatih kemampuan event management dan public relations?'),
-        q('Saat nongkrong, obrolan tiba-tiba jadi diskusi serius soal strategi kampanye iklan atau branding suatu brand?'),
-      ]
-    },
-    {
-      title: 'Misi 2: Strategi & Eksekusi Komunikasi',
-      level: 2, min_point: 20,
-      questions: [
-        q('Saat kerja kelompok kampanye komunikasi, sering yang menyusun alur pesan, strategi media, dan target audiensnya?'),
-        q('Pernah menganalisis strategi media sosial brand ternama saat nongkrong dan jadi lebih seru daripada bahas tugas?'),
-      ]
-    },
-    {
-      title: 'Misi 3: Analisis & Dampak Komunikasi',
-      level: 3, min_point: 50,
-      questions: [
-        q('Saat membaca berita viral, tiba-tiba mempertanyakan framing dan agenda setting yang digunakan media tersebut?'),
-        q('Lebih tertarik memahami mengapa suatu kampanye komunikasi berhasil menggerakkan opini publik daripada sekadar meniru formatnya?'),
-      ]
-    },
-  ],
+  HARD: [
+    q("Kalau ada suatu masalah, refleks pertama kamu adalah mencari alasan \"kenapa ini bisa terjadi\"?", "Pola pikir kritis ini akan sangat berguna ketika kamu menyusun skripsi dan mencari akar permasalahan."),
+    q("Pernah lebih tertarik memahami pola pikir seseorang daripada mencari siapa yang benar?", "Di rumpun Soshum kamu akan bertemu dengan kebiasaan bertukar pendapat. Nah, dari situ kamu bisa menilai pola pikir seseorang dan juga menambah perspektif baru untukmu."),
+    q("Saat membaca berita, pernah tiba-tiba mempertanyakan sudut pandang yang digunakan?", "Kamu pasti akan mengalami ini, 'Loh kok perspektifku beda ya?'. Hal ini sangat wajar ya. Kamu bisa tahu lebih luas dari berbagai perspektif yang berbeda dalam lingkup Soshum."),
+    q("Kalau dosen memberi satu kasus, otomatis kepikiran banyak perspektif yang berbeda?", "Ini bakal membuat kamu dilema sih, perspektif mana yang akan kamu pakai untuk menjawab kasus dari dosen tersebut. Tapi tidak apa-apa, pelan-pelan saja ya. Pahami dengan baik, nanti pasti ketemu perspektif yang menurut kamu pas."),
+    q("Pernah merasa diskusi yang seru lebih memuaskan daripada menemukan jawaban pasti?", "Soshum pasti tidak asing dengan yang namanya debat. Biasanya sih dalam diskusi kamu bakal berdebat seru terkait suatu hal. Ingat, hanya untuk seru-seruan berdiskusi saja ya!"),
+    q("Saat melihat suatu fenomena, refleks bertanya \"apa dampaknya bagi masyarakat?\"", "Namanya juga anak Soshum, pasti akrab dengan kata 'masyarakat', karena pengaruh suatu peristiwa sering menjadi perhatian utama dalam kehidupan bermasyarakat.")
+  ]
 }
 
-// ─── SEED FUNCTION ────────────────────────────────────────────────────────────
+const SAINTEK_CATEGORIES = [
+  'Kesehatan', 'Teknik & Rekayasa', 'Komputasi & Data', 'Arsitektur', 'Pendidikan Saintek'
+]
+
+const SOSHUM_CATEGORIES = [
+  'Sosial & Humaniora', 'Pendidikan', 'Bisnis & Ekonomi', 'Bahasa, Seni & Kreatif', 'Komunikasi Kreatif'
+]
 
 async function main() {
-  console.log('🌱 Seeding game missions (sistem poin SS/P/J/BP)...')
+  console.log('🌱 Seeding game missions (Ya/Tidak)...')
 
-  // Hapus semua data game lama
   await prisma.gameProgress.deleteMany()
   await prisma.gameQuestion.deleteMany()
   await prisma.gameMission.deleteMany()
   await prisma.majorProfile.deleteMany()
   await prisma.major.deleteMany()
 
-  // ── Seed Saintek ────────────────────────────────────────────────────────
-  console.log('📗 Seeding SAINTEK...')
-  for (const [categoryName, missions] of Object.entries(SAINTEK_MISSIONS)) {
+  // ─── Seed Saintek ──────────────────────────────────────────────────────────────────
+  console.log('📘 Seeding SAINTEK...')
+  for (const categoryName of SAINTEK_CATEGORIES) {
     const major = await prisma.major.create({
       data: {
         name: categoryName,
@@ -339,23 +109,38 @@ async function main() {
       }
     })
 
-    for (const mission of missions) {
-      await prisma.gameMission.create({
-        data: {
-          major_id: major.id,
-          title: mission.title,
-          level: mission.level,
-          min_point: mission.min_point,
-          questions: { create: mission.questions }
-        }
-      })
-    }
-    console.log(`  ✅ ${categoryName} — ${missions.length} misi`)
+    await prisma.gameMission.create({
+      data: {
+        major_id: major.id,
+        title: 'Misi 1: Level Dasar',
+        level: 1, min_point: 10,
+        questions: { create: SAINTEK_QUESTIONS.EASY }
+      }
+    })
+    
+    await prisma.gameMission.create({
+      data: {
+        major_id: major.id,
+        title: 'Misi 2: Level Menengah',
+        level: 2, min_point: 20,
+        questions: { create: SAINTEK_QUESTIONS.MEDIUM }
+      }
+    })
+    
+    await prisma.gameMission.create({
+      data: {
+        major_id: major.id,
+        title: 'Misi 3: Level Mahir',
+        level: 3, min_point: 50,
+        questions: { create: SAINTEK_QUESTIONS.HARD }
+      }
+    })
+    console.log(`  ✅ ${categoryName} — 3 misi`)
   }
 
-  // ── Seed Soshum ─────────────────────────────────────────────────────────
-  console.log('📘 Seeding SOSHUM...')
-  for (const [categoryName, missions] of Object.entries(SOSHUM_MISSIONS)) {
+  // ─── Seed Soshum ───────────────────────────────────────────────────────────────────
+  console.log('📕 Seeding SOSHUM...')
+  for (const categoryName of SOSHUM_CATEGORIES) {
     const major = await prisma.major.create({
       data: {
         name: categoryName,
@@ -371,26 +156,36 @@ async function main() {
       }
     })
 
-    for (const mission of missions) {
-      await prisma.gameMission.create({
-        data: {
-          major_id: major.id,
-          title: mission.title,
-          level: mission.level,
-          min_point: mission.min_point,
-          questions: { create: mission.questions }
-        }
-      })
-    }
-    console.log(`  ✅ ${categoryName} — ${missions.length} misi`)
+    await prisma.gameMission.create({
+      data: {
+        major_id: major.id,
+        title: 'Misi 1: Level Dasar',
+        level: 1, min_point: 10,
+        questions: { create: SOSHUM_QUESTIONS.EASY }
+      }
+    })
+    
+    await prisma.gameMission.create({
+      data: {
+        major_id: major.id,
+        title: 'Misi 2: Level Menengah',
+        level: 2, min_point: 20,
+        questions: { create: SOSHUM_QUESTIONS.MEDIUM }
+      }
+    })
+    
+    await prisma.gameMission.create({
+      data: {
+        major_id: major.id,
+        title: 'Misi 3: Level Mahir',
+        level: 3, min_point: 50,
+        questions: { create: SOSHUM_QUESTIONS.HARD }
+      }
+    })
+    console.log(`  ✅ ${categoryName} — 3 misi`)
   }
 
-  const totalCat = Object.keys(SAINTEK_MISSIONS).length + Object.keys(SOSHUM_MISSIONS).length
   console.log(`\n🎉 Seeding selesai!`)
-  console.log(`   📂 Total kategori : ${totalCat} (5 Saintek + 5 Soshum)`)
-  console.log(`   📋 Total misi     : ${totalCat * 3} (3 per kategori)`)
-  console.log(`   ❓ Total soal     : ${totalCat * 3 * 2} (2 per misi)`)
-  console.log(`   🎯 Sistem poin    : SS=20 | P=15 | J=10 | BP=5`)
 }
 
 main()

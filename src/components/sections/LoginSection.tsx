@@ -10,9 +10,10 @@ interface LoginSectionProps {
   onSubmit: (email: string, password: string) => Promise<void>
   isLoading?: boolean
   error?: string
+  message?: string
 }
 
-export const LoginSection = ({ onSubmit, isLoading = false, error }: LoginSectionProps) => {
+export const LoginSection = ({ onSubmit, isLoading = false, error, message }: LoginSectionProps) => {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -91,6 +92,7 @@ export const LoginSection = ({ onSubmit, isLoading = false, error }: LoginSectio
           </div>
 
           {error && <Alert type="error" message={error} className="mb-6" />}
+          {message && <Alert type="success" message={message} className="mb-6" />}
 
           <Form onSubmit={handleSubmit} className="space-y-6">
             <FormGroup>

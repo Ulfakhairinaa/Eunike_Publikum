@@ -15,7 +15,7 @@ Sebelum mulai, pastikan komputer Anda sudah terinstal perangkat lunak berikut:
 
 ---
 
-## 🚀 Panduan Clone & Instalasi (Langkah demi Langkah)
+## 🚀 Panduan Instalasi & Menjalankan Aplikasi (Langkah demi Langkah)
 
 ### 1. Clone Repositori
 Buka terminal Anda dan jalankan perintah berikut untuk mengunduh kode ke komputer lokal:
@@ -31,7 +31,7 @@ npm install
 ```
 
 ### 3. Konfigurasi Environment Variables (.env)
-Aplikasi ini terhubung dengan *database* Supabase. Anda **wajib** membuat file `.env` di folder *root* proyek (sejajar dengan file `package.json`).
+Aplikasi ini terhubung dengan *database* Supabase. Anda **wajib** membuat file `.env` dan `.env.local` (jika diperlukan) di folder *root* proyek (sejajar dengan file `package.json`).
 
 Buat file bernama `.env` dan masukkan variabel berikut:
 ```env
@@ -43,16 +43,35 @@ DIRECT_URL="<MINTA_KE_TIM_BACKEND>"
 NEXT_PUBLIC_SUPABASE_URL="<MINTA_KE_TIM_BACKEND>"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="<MINTA_KE_TIM_BACKEND>"
 ```
-*(Catatan: Mintalah keempat nilai kredensial di atas kepada orang yang memberikan proyek ini kepada Anda, lalu tempelkan menggantikan `<MINTA_KE_TIM_BACKEND>`.)*
+*(Catatan: Mintalah keempat nilai kredensial di atas kepada tim Backend / Project Manager Anda, lalu tempelkan menggantikan `<MINTA_KE_TIM_BACKEND>`.)*
 
-### 4. Sinkronisasi Prisma (Database Client)
-Setelah file `.env` siap, Anda perlu membuat (*generate*) Prisma Client agar TypeScript mengenali skema database:
-```bash
-npx prisma generate
-```
+### 4. Sinkronisasi Database (Prisma)
+Setelah file `.env` siap, Anda perlu membuat (*generate*) Prisma Client agar TypeScript mengenali skema database terbaru, lalu memastikan struktur tabel di database sudah sinkron:
 
-### 5. Jalankan Server Development
-Sekarang aplikasi sudah siap dijalankan! Gunakan perintah berikut:
+1. Buat Prisma Client (wajib setiap kali ada perubahan skema atau setelah clone baru):
+   ```bash
+   npx prisma generate
+   ```
+2. Sinkronisasikan skema ke database (Hati-hati: pastikan database yang digunakan adalah database development):
+   ```bash
+   npx prisma db push
+   ```
+
+### 5. Memasukkan Data Awal (Seeding)
+Agar aplikasi dapat berjalan dengan data yang relevan (seperti pertanyaan kuis RIASEC dan misi game), Anda wajib menjalankan perintah *seeding* berikut secara berurutan:
+
+1. Menjalankan *seed* dasar (untuk memasukkan Role, Kategori RIASEC, dan Bank Soal Kuis awal):
+   ```bash
+   npm run seed
+   ```
+2. Menjalankan *seed* khusus untuk Misi Game Interaktif (memasukkan soal-soal jurusan SAINTEK & SOSHUM beserta Fun Fact-nya):
+   ```bash
+   npm run seed:game
+   ```
+*(Catatan: Pastikan muncul tulisan "Seeding selesai!" atau "Success" tanpa error warna merah di terminal pada kedua perintah di atas).*
+
+### 6. Jalankan Server Development
+Sekarang aplikasi dan database sudah siap! Gunakan perintah berikut untuk menjalankan web:
 ```bash
 npm run dev
 ```

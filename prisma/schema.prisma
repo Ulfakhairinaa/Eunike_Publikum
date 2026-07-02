@@ -103,6 +103,7 @@ model GameQuestion {
   option_d        String
   correct_option  String
   points          Int
+  funfact         String?
 }
 
 model GameProgress {

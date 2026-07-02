@@ -42,7 +42,7 @@ export function MissionInteractiveCards({ missions, initialPoints }: { missions:
           let cardBg = 'bg-white'
           
           // Target Points based on Level
-          const targetPoints = mission.level === 1 ? 20 : mission.level === 2 ? 30 : 40
+          const targetPoints = mission.questions ? mission.questions.length * 10 : (mission.level === 1 ? 20 : mission.level === 2 ? 30 : 40)
 
           // Gradient Colors (For FRONT SIDE)
           let gradient = 'from-emerald-400 to-green-600'
@@ -148,7 +148,7 @@ export function MissionInteractiveCards({ missions, initialPoints }: { missions:
                       <FileText size={14} /> {mission.questions?.length || 0} Soal Pilihan Ganda
                     </div>
                     <div className="flex items-center gap-2 text-xs text-slate-600">
-                      <Flag size={14} /> Lulus: Wajib Tepat {targetPoints} Poin
+                      <Flag size={14} /> Lulus: Selesaikan Semua Soal
                     </div>
                   </div>
                 )}

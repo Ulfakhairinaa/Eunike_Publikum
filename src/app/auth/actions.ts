@@ -67,7 +67,11 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  if (authData.session) {
+    redirect('/dashboard')
+  } else {
+    redirect('/auth/login?message=Pendaftaran+berhasil.+Silakan+cek+email+Anda+untuk+verifikasi+akun.')
+  }
 }
 
 export async function logout() {

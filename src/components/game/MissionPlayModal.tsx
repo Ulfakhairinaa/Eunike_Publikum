@@ -2,23 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Trophy, HelpCircle, Flag, Award, Star, TrendingUp, ArrowRight } from 'lucide-react'
-
-// Poin berdasarkan pilihan
-const OPTION_POINTS: Record<string, number> = {
-  'Sangat Sering': 20,
-  'Pernah': 15,
-  'Jarang': 10,
-  'Belum Pernah': 5,
-}
+import { Trophy, HelpCircle, Flag, Award, Star, TrendingUp, ArrowRight, Lightbulb } from 'lucide-react'
 
 const OPTION_LABELS: Record<string, { label: string; shortLabel: string; color: string; bg: string }> = {
-  'Sangat Sering': { label: 'Sangat Sering', shortLabel: 'SS', color: 'text-blue-700', bg: 'bg-blue-600' },
-  'Pernah':        { label: 'Pernah',         shortLabel: 'P',  color: 'text-indigo-700', bg: 'bg-indigo-500' },
-  'Jarang':        { label: 'Jarang',          shortLabel: 'J',  color: 'text-slate-600', bg: 'bg-slate-400' },
-  'Belum Pernah':  { label: 'Belum Pernah',   shortLabel: 'BP', color: 'text-slate-500', bg: 'bg-slate-300' },
+  'Ya':    { label: 'Ya',    shortLabel: 'Y', color: 'text-green-700', bg: 'bg-green-600' },
+  'Tidak': { label: 'Tidak', shortLabel: 'T', color: 'text-rose-700',  bg: 'bg-rose-600' },
 }
 
 interface MissionPlayModalProps {
@@ -40,8 +30,7 @@ const getRankDetails = (xp: number) => {
 export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoints = 0, onNextMission }: MissionPlayModalProps) {
   const router = useRouter()
   const questions: any[] = mission?.questions || []
-  // Target Poin: Easy=20, Medium=30, Hard=40
-  const passingScore = mission?.level === 1 ? 20 : mission?.level === 2 ? 30 : 40
+  const passingScore = questions.length * 10
   
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState<string | null>(null)
@@ -71,7 +60,7 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
   const handleNext = async () => {
     if (!selectedOption) return
 
-    const addedScore = OPTION_POINTS[selectedOption] ?? 5
+    const addedScore = 10 // Apapun jawabannya (Ya/Tidak), tetap dapat poin penyelesaian
     const newScore = score + addedScore
 
     setScore(newScore)
@@ -92,8 +81,7 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
       })
 
       if (res.ok) {
-        // Harus mencapai nilai persis sama dengan passingScore (skor sempurna)
-        const passed = newScore === passingScore
+        const passed = true // Semua jawaban benar dalam konteks eksplorasi
         setCompletionData({ passed, score: newScore })
         if (passed) onSuccess(newScore)
       } else {
@@ -139,7 +127,7 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
                     </div>
                     <div className="text-right">
                       <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Performance</div>
-                      <div className="text-[15px] font-bold text-slate-800">{questions.length}/{questions.length} Questions Correct</div>
+                      <div className="text-[15px] font-bold text-slate-800">{questions.length}/{questions.length} Questions</div>
                     </div>
                   </div>
                   
@@ -181,19 +169,6 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
                   </Button>
                 </div>
               </div>
-
-              {/* Footer */}
-              <div className="bg-[#e4ebf5] py-4 flex items-center justify-center gap-3 w-full">
-                <div className="flex -space-x-2">
-                  <div className="w-7 h-7 rounded-full bg-slate-300 border-2 border-[#e4ebf5] flex items-center justify-center overflow-hidden">
-                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="w-7 h-7 rounded-full bg-slate-400 border-2 border-[#e4ebf5] flex items-center justify-center text-[9px] font-bold text-white z-10">
-                    +12
-                  </div>
-                </div>
-                <span className="text-[12px] text-slate-600 font-medium">12 other students just finished this mission</span>
-              </div>
             </div>
           ) : (
             <div className="p-10 text-center space-y-6 bg-gradient-to-b from-blue-50 to-white">
@@ -206,12 +181,9 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
                 <h2 className="text-2xl font-bold text-slate-800">
                   Misi Gagal
                 </h2>
-                <p className="text-slate-500 mt-2">
-                  Kamu mendapatkan <span className="font-bold text-red-500">{completionData.score} poin</span>.
-                </p>
                 <div className="bg-red-50 border border-red-200 text-red-600 p-4 rounded-lg mt-4 text-sm text-left">
-                  <p className="font-bold mb-1">❌ Misi Gagal: Skor Belum Sempurna!</p>
-                  <p>Kamu harus mencapai tepat <strong>{passingScore} poin</strong> (tidak kurang dan tidak lebih) untuk menyelesaikan misi ini. Silakan coba lagi dan pastikan setiap langkahmu tepat sasaran!</p>
+                  <p className="font-bold mb-1">❌ Terjadi Kesalahan</p>
+                  <p>Misi tidak dapat diselesaikan. Silakan coba lagi.</p>
                 </div>
               </div>
               <div className="pt-4 flex gap-3 justify-center">
@@ -228,7 +200,7 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
               <h2 className="text-xl font-bold">{mission.title}</h2>
               <div className="flex items-center gap-4 mt-2 text-sm text-blue-100">
                 <span className="flex items-center gap-1"><HelpCircle size={14}/> {questions.length} Pertanyaan</span>
-                <span className="flex items-center gap-1"><Flag size={14}/> Lulus: {passingScore} Poin</span>
+                <span className="flex items-center gap-1"><Flag size={14}/> Selesaikan Semua</span>
               </div>
             </div>
 
@@ -250,9 +222,9 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
                 </div>
 
                 <div className="space-y-3">
-                  {['Sangat Sering', 'Pernah', 'Jarang', 'Belum Pernah'].map((opt) => {
+                  {['Ya', 'Tidak'].map((opt) => {
                     const isSelected = selectedOption === opt
-                    const labelData = OPTION_LABELS[opt]
+                    const labelData = OPTION_LABELS[opt] || { shortLabel: opt[0], bg: 'bg-slate-500', color: 'text-slate-700' }
                     return (
                       <button
                         key={opt}
@@ -261,7 +233,7 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
                           isSelected ? 'border-blue-500 bg-blue-50 ring-4 ring-blue-500/10' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                         }`}
                       >
-                        <span className={`font-medium ${isSelected ? 'text-blue-700' : 'text-slate-700'}`}>{opt}</span>
+                        <span className={`font-medium ${isSelected ? labelData.color : 'text-slate-700'}`}>{opt}</span>
                         {isSelected && (
                           <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${labelData.bg}`}>
                             {labelData.shortLabel}
@@ -272,12 +244,27 @@ export function MissionPlayModal({ mission, isOpen, onClose, onSuccess, totalPoi
                   })}
                 </div>
 
+                {/* Funfact Box - Appears after selecting an option */}
+                {selectedOption && currentQuestion.funfact && (
+                  <div className="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200 animate-in fade-in slide-in-from-bottom-2 duration-300 flex gap-3">
+                    <div className="shrink-0 mt-0.5 text-amber-500">
+                      <Lightbulb size={20} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">Fun Fact</p>
+                      <p className="text-sm text-slate-700 leading-relaxed">
+                        {currentQuestion.funfact}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <Button 
                   onClick={handleNext} 
                   disabled={!selectedOption || isSubmitting}
-                  className="w-full bg-[#0B3B60] hover:bg-[#072a44] text-white py-6"
+                  className="w-full bg-[#0B3B60] hover:bg-[#072a44] text-white py-6 mt-6"
                 >
-                  {isSubmitting ? 'Memproses...' : currentIndex < questions.length - 1 ? 'Pertanyaan Selanjutnya' : 'Selesaikan Misi'}
+                  {isSubmitting ? 'Memproses...' : currentIndex < questions.length - 1 ? 'Lanjut ke Pertanyaan Berikutnya' : 'Selesaikan Misi'}
                 </Button>
               </div>
             ) : (

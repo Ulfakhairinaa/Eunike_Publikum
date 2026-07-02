@@ -46,7 +46,7 @@ export default async function CategoryMissionsPage({ params }: { params: Promise
       }
     },
     include: {
-      questions: { select: { id: true, scenario_text: true, option_a: true, option_b: true, option_c: true, option_d: true } },
+      questions: { select: { id: true, scenario_text: true, option_a: true, option_b: true, option_c: true, option_d: true, funfact: true } },
       progress: { where: { user_id: user.id } }
     },
     orderBy: { level: 'asc' }
