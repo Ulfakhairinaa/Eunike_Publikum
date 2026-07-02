@@ -149,7 +149,7 @@ export const LandingSection = () => {
           </div>
           
           <p className="text-lg md:text-xl text-blue-50 font-medium leading-relaxed max-w-3xl mx-auto">
-            Di tengah minimnya informasi dan tekanan psikologis akan masa depan, YO-MAP lahir sebagai jawaban. Kami hadir sebagai wadah untuk mengenali minat bakat, mengatasi keraguan, dan merancang strategi matang pasca-lulus sekolah. Mulai langkah hebatmu hari ini bersama fitur unggulan kami.
+            Di tengah minimnya informasi dan rendahnya motivasi, YO-MAP lahir sebagai jawaban. Kami hadir sebagai wadah untuk mengenali minat bakat, mengatasi keraguan dan merancang strategi matang pasca-lulus sekolah. Mulai langkah hebatmu hari ini bersama fitur unggulan kami.
           </p>
         </div>
       </section>
