@@ -134,7 +134,7 @@ export const QuizDetailSection = ({
 
               {isLastQuestion ? (
                 <Button 
-                  variant="primary" 
+                  variant="default" 
                   onClick={onSubmit}
                   disabled={Object.keys(answers).length !== questions.length}
                 >
@@ -142,7 +142,7 @@ export const QuizDetailSection = ({
                 </Button>
               ) : (
                 <Button 
-                  variant="primary" 
+                  variant="default" 
                   onClick={onNext}
                   disabled={!currentAnswer}
                 >

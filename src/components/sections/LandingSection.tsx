@@ -131,20 +131,20 @@ export const LandingSection = () => {
           <div className="grid md:grid-cols-2 gap-6 text-left">
             <div className="bg-white rounded-3xl p-8 text-slate-900 shadow-2xl">
               <h3 className="text-6xl font-black text-[#0B3B60] mb-2 tracking-tighter">61%</h3>
-              <h4 className="text-xl font-bold mb-3">Mahasiswa Salah Jurusan</h4>
+              <h4 className="text-xl font-bold mb-3">Siswa Kekurangan Informasi</h4>
               <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                Siswa mengalami kesulitan untuk menentukan karir akibat kekurangan sumber informasi.
+                Siswa kekurangan informasi untuk mengenali minat dan bakatnya.
               </p>
               <p className="text-xs font-medium text-slate-400">Kusmana, N. I. D., et al. 2024</p>
             </div>
             
             <div className="bg-white rounded-3xl p-8 text-slate-900 shadow-2xl">
-              <h3 className="text-6xl font-black text-[#0B3B60] mb-2 tracking-tighter">70%</h3>
-              <h4 className="text-xl font-bold mb-3">Siswa Bingung Karir</h4>
+              <h3 className="text-5xl md:text-6xl font-black text-[#0B3B60] mb-2 tracking-tighter">50–60%</h3>
+              <h4 className="text-xl font-bold mb-3">Mahasiswa Salah Jurusan</h4>
               <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                Dari jumlah 6.399 korban pelanggaran HAM tersebut menunjukkan gangguan psikologis.
+                Akibat minimnya Informasi mengenai Kapasitas &amp; Kemampuan Diri (Pra-Kuliah) sehingga Motivasi Belajar Menurun secara signifikan.
               </p>
-              <p className="text-xs font-medium text-slate-400">Komisi Kebenaran dan Rekonsiliasi (KKR), 2023</p>
+              <p className="text-xs font-medium text-slate-400">Persoalan Salah Jurusan Mahasiswa, binus.ac.id, 2025.</p>
             </div>
           </div>
           
@@ -222,10 +222,10 @@ export const LandingSection = () => {
             {/* Feature 4 */}
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-slate-100 flex flex-col">
               <div className="relative h-48 bg-slate-100 overflow-hidden">
-                <Image src="/images/feat-game.png" alt="Game Interaktif" fill className="object-cover" />
+                <Image src="/images/feat-game.png" alt="Kompas Masa Depan" fill className="object-cover" />
               </div>
               <div className="p-6 flex-1 flex flex-col">
-                <h3 className="font-bold text-lg text-slate-900 mb-2">Game Interaktif</h3>
+                <h3 className="font-bold text-lg text-slate-900 mb-2">Kompas Masa Depan</h3>
                 <p className="text-sm text-slate-500 mb-6 flex-1">
                   Belajar eksplorasi karir dengan cara yang seru dan menyenangkan melalui Career Adventure.
                 </p>

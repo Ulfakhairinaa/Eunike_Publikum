@@ -28,7 +28,7 @@ const navItems: NavItem[] = [
   { href: '/rekomendasi-jurusan', label: 'Rekomendasi Jurusan', icon: GraduationCap, requiresTest: true },
   { href: '/detail-jurusan', label: 'Detail Jurusan', icon: Info, requiresTest: true },
   { href: '/prospek-karier', label: 'Prospek Karier', icon: Briefcase, requiresTest: true },
-  { href: '/game-interaktif', label: 'Game Interaktif', icon: Gamepad2, requiresTest: true },
+  { href: '/game-interaktif', label: 'Kompas Masa Depan', icon: Gamepad2, requiresTest: true },
   { href: '/riwayat', label: 'Riwayat', icon: History },
 ]
 

@@ -201,10 +201,6 @@ export const DetailJurusanSection = ({
                 <p className="text-[14px] text-blue-100/90 leading-relaxed mb-8">
                   Berdasarkan hasil tes minat bakatmu ({riasecCode}), kamu memiliki kemampuan analitis dan pemecahan masalah yang menonjol. {selectedMajor} adalah <strong>"The Perfect Choice"</strong> untukmu.
                 </p>
-
-                <button className="w-full bg-white hover:bg-slate-50 text-[#0B3B60] font-bold py-3.5 rounded-xl transition-all shadow-sm">
-                  Lihat Detail Kecocokan
-                </button>
               </div>
 
               {/* Prospek Karir Populer */}
@@ -237,10 +233,10 @@ export const DetailJurusanSection = ({
                 </div>
               </div>
 
-              {/* Coba Simulasi Jurusan (Redirect to Game Interaktif) */}
+              {/* Coba Simulasi Jurusan (Redirect to Kompas Masa Depan) */}
               <div className="bg-white rounded-[24px] border-2 border-dashed border-slate-200 p-8 shadow-sm text-center flex flex-col items-center">
                 <Gamepad2 size={32} className="text-[#0B3B60] mb-4" />
-                <h3 className="text-[16px] font-bold text-[#0B3B60] mb-3">Coba Game Interaktif</h3>
+                <h3 className="text-[16px] font-bold text-[#0B3B60] mb-3">Coba Kompas Masa Depan</h3>
                 <p className="text-[13px] text-slate-500 leading-relaxed mb-6">
                   Rasakan pengalaman menjadi mahasiswa melalui mini-games interaktif kami.
                 </p>

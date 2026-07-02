@@ -1,6 +1,6 @@
 import React from 'react'
-import { Button } from './Button'
-import { Input } from './Input'
+import { Button } from './button'
+import { Input } from './input'
 import clsx from 'clsx'
 
 interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
