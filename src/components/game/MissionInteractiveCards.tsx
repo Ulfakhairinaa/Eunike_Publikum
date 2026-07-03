@@ -122,7 +122,7 @@ export function MissionInteractiveCards({ missions, initialPoints }: { missions:
                 {/* Title & Desc */}
                 <div className="mb-4 flex-1">
                   <h3 className={`font-bold text-lg mb-2 leading-tight ${!isUnlocked ? 'text-gray-400' : 'text-slate-800'}`}>
-                    Misi {index + 1}: {mission.title}
+                    {mission.title}
                   </h3>
                   <p className={`text-sm leading-relaxed ${!isUnlocked ? 'text-gray-400' : 'text-slate-500'}`}>
                     {mission.description || "Uji kemampuan dasar dan pahami fundamental yang diperlukan."}
