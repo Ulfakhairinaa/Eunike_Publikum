@@ -10,15 +10,24 @@ export const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
     <div
       ref={ref}
       className={clsx(
-        'mx-auto px-4',  
+        // base safety layout
+        'w-full min-w-0 mx-auto',
+        'px-4 sm:px-6 lg:px-8',
+
+        // max width control
         size === 'sm' && 'max-w-2xl',
         size === 'md' && 'max-w-4xl',
         size === 'lg' && 'max-w-6xl',
-        size === 'full' && 'w-full',
+        size === 'full' && 'max-w-none',
+
+        // penting untuk menghindari horizontal scroll dari child
+        'overflow-x-hidden',
+
         className
       )}
       {...props}
     />
   )
 )
+
 Container.displayName = 'Container'
